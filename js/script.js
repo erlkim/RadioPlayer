@@ -1,21 +1,18 @@
-/*
-Radio Online.
 
-https://rokim.web.id
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
+const RADIO_NAME = 'Game! Radio 1';
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+// SELECT ARTWORK PROVIDER, ITUNES, DEEZER & SPOTIFY  eg : spotify 
+var API_SERVICE = 'deezer';
 
-*/
+// Change Stream URL Here, Supports, ICECAST, ZENO, SHOUTCAST, RADIOJAR ETC.... DOES NOT SUPPORT HLS
+const URL_STREAMING = 'https://stream.zeno.fm/r4mpcrfwfzzuv';
 
-var zenoid = 'uv0krbzgszpvv'
+//NOW PLAYING API.
+const API_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/r4mpcrfwfzzuv';
+
+// Visit https://api.vagalume.com.br/docs/ to get your API key
+const API_KEY = "18fe07917957c289983464588aabddfb";
 
 window.onload = function () {
     var page = new Page;
@@ -29,7 +26,7 @@ window.onload = function () {
     // Interval to get streaming data in miliseconds
     setInterval(function () {
         getStreamingData();
-    }, 6000);
+    }, 10000);
 
     var coverArt = document.getElementsByClassName('cover-album')[0];
 
@@ -71,16 +68,17 @@ function Page() {
         var $artistName = document.querySelectorAll('#historicSong article .music-info .artist');
 
         // Default cover art
-        var urlCoverArt = DEFAULT_COVER_ART;
+        var urlCoverArt = 'img/cover.png';
 
         // Get cover art for song history
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 var data = JSON.parse(this.responseText);
-                var artworkUrl100 = (data.resultCount) ? data.results[0].artworkUrl100 : urlCoverArt;
+                var artwork = data.results.artwork;
+                 var artworkXL = artwork.large;
 
-                document.querySelectorAll('#historicSong article .cover-historic')[n].style.backgroundImage = 'url(' + artworkUrl100 + ')';
+                document.querySelectorAll('#historicSong article .cover-historic')[n].style.backgroundImage = 'url(' + artworkXL + ')';
             }
             // Formating characters to UTF-8
             var music = info.song.replace(/&apos;/g, '\'');
@@ -96,7 +94,7 @@ function Page() {
             $historicDiv[n].classList.add('animated');
             $historicDiv[n].classList.add('slideInRight');
         }
-        xhttp.open('GET', 'https://itunes.apple.com/search?term=' + info.artist + ' ' + info.song + '&media=music&limit=1', true);
+        xhttp.open('GET', 'https://prod-api.radioapi.me/1ceb9727-3e36-4e64-99e7-f776b50c7f4f/musicsearch?query=' + info.artist + ' ' + info.song);
         xhttp.send();
 
         setTimeout(function () {
@@ -109,7 +107,7 @@ function Page() {
 
     this.refreshCover = function (song = '', artist) {
         // Default cover art
-        var urlCoverArt = DEFAULT_COVER_ART;
+        var urlCoverArt = 'img/cover.png';
 
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
@@ -119,15 +117,8 @@ function Page() {
             // Get cover art URL on iTunes API
             if (this.readyState === 4 && this.status === 200) {
                 var data = JSON.parse(this.responseText);
-                var artworkUrl100 = (data.resultCount) ? data.results[0].artworkUrl100 : urlCoverArt;
-
-                // Se retornar algum dado, alterar a resoluÃƒÂ§ÃƒÂ£o da imagem ou definir a padrÃƒÂ£o
-                urlCoverArt = (artworkUrl100 != urlCoverArt) ? artworkUrl100.replace('100x100bb', '1200x1200bb') : urlCoverArt;
-                var urlCoverArt96 = (artworkUrl100 != urlCoverArt) ? urlCoverArt.replace('1200x1200bb', '96x96bb') : urlCoverArt;
-                var urlCoverArt128 = (artworkUrl100 != urlCoverArt) ? urlCoverArt.replace('1200x1200bb', '128x128bb') : urlCoverArt;
-                var urlCoverArt192 = (artworkUrl100 != urlCoverArt) ? urlCoverArt.replace('1200x1200bb', '192x192bb') : urlCoverArt;
-                var urlCoverArt256 = (artworkUrl100 != urlCoverArt) ? urlCoverArt.replace('1200x1200bb', '256x256bb') : urlCoverArt;
-                var urlCoverArt384 = (artworkUrl100 != urlCoverArt) ? urlCoverArt.replace('1200x1200bb', '384x384bb') : urlCoverArt;
+                var artworkUrl100 = data.results;
+                var urlCoverArt = artworkUrl100.artwork.medium;
 
                 coverArt.style.backgroundImage = 'url(' + urlCoverArt + ')';
                 coverArt.className = 'animated bounceInLeft';
@@ -143,27 +134,27 @@ function Page() {
                         title: song,
                         artist: artist,
                         artwork: [{
-                                src: urlCoverArt96,
+                                src: urlCoverArt,
                                 sizes: '96x96',
                                 type: 'image/png'
                             },
                             {
-                                src: urlCoverArt128,
+                                src: urlCoverArt,
                                 sizes: '128x128',
                                 type: 'image/png'
                             },
                             {
-                                src: urlCoverArt192,
+                                src: urlCoverArt,
                                 sizes: '192x192',
                                 type: 'image/png'
                             },
                             {
-                                src: urlCoverArt256,
+                                src: urlCoverArt,
                                 sizes: '256x256',
                                 type: 'image/png'
                             },
                             {
-                                src: urlCoverArt384,
+                                src: urlCoverArt,
                                 sizes: '384x384',
                                 type: 'image/png'
                             },
@@ -177,7 +168,7 @@ function Page() {
                 }
             }
         }
-        xhttp.open('GET', 'https://itunes.apple.com/search?term=' + artist + ' ' + song + '&media=music&limit=1', true);
+        xhttp.open('GET', 'https://prod-api.radioapi.me/1ceb9727-3e36-4e64-99e7-f776b50c7f4f/musicsearch?query=' + artist + ' ' + song);
         xhttp.send();
     }
 
@@ -230,7 +221,6 @@ function Page() {
     }
 }
 
-//var audio = new Audio(URL_STREAMING + '/;');
 var audio = new Audio(URL_STREAMING);
 
 // Player control
@@ -260,18 +250,20 @@ function Player() {
 // On play, change the button to pause
 audio.onplay = function () {
     var botao = document.getElementById('playerButton');
-
+    var bplay = document.getElementById('buttonPlay');
     if (botao.className === 'fa fa-play') {
         botao.className = 'fa fa-pause';
+        bplay.firstChild.data = 'PAUSE';
     }
 }
 
 // On pause, change the button to play
 audio.onpause = function () {
     var botao = document.getElementById('playerButton');
-
+    var bplay = document.getElementById('buttonPlay');
     if (botao.className === 'fa fa-pause') {
         botao.className = 'fa fa-play';
+        bplay.firstChild.data = 'PLAY';
     }
 }
 
@@ -283,7 +275,7 @@ audio.onvolumechange = function () {
 }
 
 audio.onerror = function () {
-    var confirmacao = confirm('Error on communicate to server. \nClick OK to try again.');
+    var confirmacao = confirm('Stream Down / Network Error. \nClick OK to try again.');
 
     if (confirmacao) {
         window.location.reload();
@@ -342,45 +334,39 @@ function mute() {
 function getStreamingData() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
-
         if (this.readyState === 4 && this.status === 200) {
-
-            if(this.response.length === 0) {
-                console.log('%cdebug', 'font-size: 22px')
+            if (this.response.length === 0) {
+                console.log('%cdebug', 'font-size: 22px');
             }
 
             var data = JSON.parse(this.responseText);
+            console.log('Received data:', data); // Add this line for debugging
 
             var page = new Page();
 
-            var currentSongElement = document.getElementById('currentSong');
-
             // Formating characters to UTF-8
-            let song = data.currentSong.replace(/&apos;/g, '\'');
-            currentSong = song.replace(/&amp;/g, '&');
-
-            let artist = data.currentArtist.replace(/&apos;/g, '\'');
-            currentArtist = artist.replace(/&amp;/g, '&');
+            let song = data.song ? data.song.replace(/&apos;/g, '\'') : '';
+            let artist = data.artist ? data.artist.replace(/&apos;/g, '\'') : '';
 
             // Change the title
-            document.title = currentArtist + ' - ' + currentSong + ' | ' + RADIO_NAME;
+            document.title = song + ' - ' + artist + ' | ' + RADIO_NAME;
 
-            if (currentSongElement.innerText !== song.trim()) {
-                page.refreshCover(currentSong, currentArtist);
-                page.refreshCurrentSong(currentSong, currentArtist);
-                page.refreshLyric(currentSong, currentArtist);
+            if (document.getElementById('currentSong').innerHTML !== song) {
+                page.refreshCover(song, artist);
+                page.refreshCurrentSong(song, artist);
+                page.refreshLyric(song, artist);
 
                 for (var i = 0; i < 2; i++) {
-                    page.refreshHistoric(data.songHistory[i], i);
+                    page.refreshHistoric(data.history[i], i);
                 }
             }
-        } 
+        }
     };
 
     var d = new Date();
 
     // Requisition with timestamp to prevent cache on mobile devices
-    xhttp.open('GET', 'https://api.streamafrica.net/zeno/index.php?z='+zenoid);
+    xhttp.open('GET', API_URL);
     xhttp.send();
 }
 
