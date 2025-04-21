@@ -6,10 +6,10 @@ const RADIO_NAME = 'Game! Radio 1';
 var API_SERVICE = 'deezer';
 
 // Change Stream URL Here, Supports, ICECAST, ZENO, SHOUTCAST, RADIOJAR ETC.... DOES NOT SUPPORT HLS
-const URL_STREAMING = 'https://stream.zeno.fm/uv0krbzgszpvv';
+const URL_STREAMING = 'https://stream.zeno.fm/n4gzbe9ufzzuv';
 
 //NOW PLAYING API.
-const API_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/uv0krbzgszpvv';
+const API_URL = 'https://api.zeno.fm/mounts/metadata/subscribe/n4gzbe9ufzzuv';
 
 // Visit https://api.vagalume.com.br/docs/ to get your API key
 const API_KEY = "18fe07917957c289983464588aabddfb";
